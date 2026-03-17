@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>Прайс оборудования ГБО</title>
+
+<script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
+
+<style>
+
+body{
+font-family:Arial;
+background:#f4f6fb;
+margin:0;
+padding:40px;
+}
+
+h1{
+text-align:center;
+margin-bottom:30px;
+}
+
+#search{
+display:block;
+margin:0 auto 20px auto;
+padding:10px;
+width:300px;
+font-size:16px;
+}
+
+table{
+width:100%;
+border-collapse:collapse;
+background:white;
+box-shadow:0 5px 15px rgba(0,0,0,0.1);
+}
+
+th,td{
+padding:10px;
+border:1px solid #ddd;
+}
+
+th{
+background:#0aa84f;
+color:white;
+cursor:pointer;
+}
+
+tr:nth-child(even){
+background:#f2f2f2;
+}
+
+</style>
+</head>
+
+<body>
+
+<h1>Прайс оборудования ГБО</h1>
+
+<input type="text" id="search" placeholder="Поиск товара...">
+
+<table id="priceTable">
+<thead>
+<tr>
+<th>Код</th>
+<th>Наименование</th>
+<th>Ед</th>
+<th>Цена</th>
+</tr>
+</thead>
+<tbody></tbody>
+</table>
+
+<script>
+
+let tableBody=document.querySelector("#priceTable tbody")
+
+fetch("gbo_price_full.xlsx")
+.then(res=>res.arrayBuffer())
+.then(data=>{
+
+let workbook=XLSX.read(data,{type:"array"})
+
+let sheet=workbook.Sheets[workbook.SheetNames[0]]
+
+let rows=XLSX.utils.sheet_to_json(sheet,{header:1})
+
+rows.slice(1).forEach(row=>{
+
+if(row.length>0){
+
+let tr=document.createElement("tr")
+
+row.forEach(cell=>{
+let td=document.createElement("td")
+td.textContent=cell
+tr.appendChild(td)
+})
+
+tableBody.appendChild(tr)
+
+}
+
+})
+
+})
+
+
+// поиск
+
+document.getElementById("search").addEventListener("keyup",function(){
+
+let filter=this.value.toLowerCase()
+let rows=document.querySelectorAll("#priceTable tbody tr")
+
+rows.forEach(row=>{
+
+let text=row.innerText.toLowerCase()
+
+row.style.display=text.includes(filter)?"":"none"
+
+})
+
+})
+
+</script>
+
+</body>
+</html>
